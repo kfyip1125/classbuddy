@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Management Portal - BYKNMC</title>
+    <style>
+        :root {
+            --primary-bg: #f4b65a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --accent-color: #0056b3;
+            --school-color: #8b0000;
+            --text-main: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--primary-bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        h1 {
+            color: var(--school-color);
+            border-bottom: 3px solid var(--school-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .nav-card {
+            background: white;
+            border: 2px solid #eee;
+            padding: 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav-card h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--accent-color);
+        }
+
+        .nav-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="school-logo">
+        <h1>考試系統目錄 <br><span style="font-size: 1.5rem;">Exam System Directory</span></h1>
+    </div>
+    
+    <div class="menu-grid">
+        <a href="exam_clock.html" class="nav-card">
+            <div class="icon">⏲️</div>
+            <h2>Exam Clock</h2>
+            <p>English Version for General Invigilation</p>
+        </a>
+
+        <a href="exam_clock - C.html" class="nav-card">
+            <div class="icon">鐘</div>
+            <h2>考試監考系統</h2>
+            <p>佛教葉紀南紀念中學 (中文版)</p>
+        </a>
+
+        <a href="timer.html" class="nav-card">
+            <div class="icon">📢</div>
+            <h2>Real-Time Clock</h2>
+            <p>Custom Messages & Clock Display</p>
+        </a>
+    </div>
+
+    <p style="margin-top: 3rem; color: #888; font-size: 0.8rem;">
+        Select a tool to begin. Fullscreen mode will activate upon starting a session.
+    </p>
+</div>
+
+</body>
+</html>

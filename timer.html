@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Clock & Schedule</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://www.pokemon.com/static-assets/content-assets/cms2/img/cards/web/ME2PT5/ME2PT5_EN_226.png');
+            background-repeat: repeat; 
+            background-size: auto; 
+            background-attachment: fixed; 
+            overflow: hidden; /* Prevent scrollbars from the marquee */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 50px 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 1000px; 
+            width: 80%;
+            z-index: 10;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            resize: none;
+        }
+
+        #custom-message {
+            font-size: 5rem; 
+            color: #17f5ea; 
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 1.1;
+            word-wrap: break-word; 
+            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 4px 4px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .schedule-box {
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0 auto 20px auto;
+            max-width: 90%; 
+        }
+        
+        #next-lesson-name {
+            font-size: 1.5rem;
+            color: #444;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        #lesson-countdown {
+            font-size: 5rem; 
+            font-family: monospace;
+            font-weight: bold;
+            color: #3b4cca; 
+        }
+
+        #date-display { font-size: 1.2rem; color: #555; }
+        #clock-display { font-size: 2.5rem; font-family: monospace; font-weight: bold; color: #222; margin-bottom: 20px; }
+
+        button {
+            background-color: #3b4cca; 
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+
+        button:hover { background-color: #2a3899; }
+        .refresh-btn { background-color: #ffcb05; color: #3b4cca; }
+        .refresh-btn:hover { background-color: #e5b604; }
+
+        .hidden { display: none; }
+
+        /* --- ROLLING BAR STYLES --- */
+        .marquee-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            padding: 10px 0;
+            border-top: 4px solid #3b4cca;
+            z-index: 1000;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            padding-left: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            animation: marquee 50s linear infinite;
+        }
+
+        .marquee-content span {
+            margin-right: 80px;
+            display: inline-block;
+        }
+
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="setup-page">
+            <h2>Clock & Schedule Setup</h2>
+            <textarea id="message-input" placeholder="Type a message to display on the screen..."></textarea>
+            <br>
+            <button onclick="startClock()">Show Clock</button>
+        </div>
+
+        <div id="clock-page" class="hidden">
+            <div id="custom-message"></div>
+            
+            <div class="schedule-box">
+                <div id="next-lesson-name">Calculating next lesson...</div>
+                <div id="lesson-countdown">--:--:--</div>
+            </div>
+
+            <div id="date-display">--</div>
+            <div id="clock-display">00:00:00</div>
+            
+            <button class="refresh-btn" onclick="fetchMessages()">🔄 Refresh Inspiration</button>
+            <button onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+
+    <div class="marquee-container" id="rolling-bar-container">
+        <div class="marquee-content" id="rolling-text">
+            <span>✨ Preparing your daily motivation...</span>
+        </div>
+    </div>
+
+    <script>
+        function startClock() {
+            const msg = document.getElementById('message-input').value;
+            document.getElementById('custom-message').innerText = msg;
+            document.getElementById('setup-page').classList.add('hidden');
+            document.getElementById('clock-page').classList.remove('hidden');
+            fetchMessages(); // Load messages when starting
+        }
+
+        function goBack() {
+            document.getElementById('setup-page').classList.remove('hidden');
+            document.getElementById('clock-page').classList.add('hidden');
+        }
+
+        // --- FETCH RANDOM MESSAGES ---
+        async function fetchMessages() {
+            const textContainer = document.getElementById('rolling-text');
+            let messages = [];
+
+            try {
+                // Fetch Bible Verse
+                const bibleRes = await fetch('https://labs.bible.org/api/?passage=random&type=json');
+                const bibleData = await bibleRes.json();
+                messages.push(`📖 ${bibleData[0].text} (${bibleData[0].bookname} ${bibleData[0].chapter}:${bibleData[0].verse})`);
+
+                // Fetch Quote
+                const quoteRes = await fetch('https://api.quotable.io/random?tags=motivational');
+                const quoteData = await quoteRes.json();
+                messages.push(`🔥 "${quoteData.content}" — ${quoteData.author}`);
+
+            } catch (e) {
+                // Fallback messages
+                messages = [
+                    "✨ I can do all things through Christ who strengthens me. (Phil 4:13)",
+                    "🚀 Success is the sum of small efforts, repeated day in and day out.",
+                    "📖 Trust in the LORD with all your heart. (Proverbs 3:5)",
+                    "🎯 Focus on your goals! You are capable of great things."
+                ];
+            }
+
+            textContainer.innerHTML = messages.map(m => `<span>${m}</span>`).join('');
+            
+            // Restart animation
+            textContainer.style.animation = 'none';
+            textContainer.offsetHeight; 
+            textContainer.style.animation = null;
+        }
+
+        // --- SCHEDULE LOGIC ---
+        const schedule = {
+            1: [{ name: "S.1", startH: 8, startM: 35, endH: 9, endM: 15 }, { name: "S.4", startH: 9, startM: 15, endH: 9, endM: 55 }, { name: "S.1", startH: 14, startM: 55, endH: 15, endM: 35 }],
+            2: [{ name: "S.1", startH: 11, startM: 40, endH: 12, endM: 20 }, { name: "S.4", startH: 14, startM: 15, endH: 14, endM: 55 }],
+            3: [{ name: "S.4", startH: 11, startM: 40, endH: 12, endM: 20 }],
+            4: [{ name: "S.4", startH: 10, startM: 10, endH: 10, endM: 50 }, { name: "S.1", startH: 14, startM: 15, endH: 14, endM: 55 }],
+            5: [{ name: "S.4", startH: 8, startM: 35, endH: 9, endM: 15 }, { name: "S.4", startH: 10, startM: 50, endH: 11, endM: 30 }, { name: "S.1", startH: 12, startM: 20, endH: 13, endM: 0 }]
+        };
+
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        function formatAmPm(hours, minutes) {
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            return `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${ampm}`;
+        }
+
+        function getNextLessonStatus(now) {
+            const currentDay = now.getDay(); 
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            if (schedule[currentDay]) {
+                for (let lesson of schedule[currentDay]) {
+                    const startMins = lesson.startH * 60 + lesson.startM;
+                    const endMins = lesson.endH * 60 + lesson.endM;
+                    if (currentMinutes >= startMins && currentMinutes < endMins) return { inProgress: true, name: lesson.name };
+                    if (currentMinutes < startMins) {
+                        const target = new Date(now); target.setHours(lesson.startH, lesson.startM, 0, 0);
+                        return { inProgress: false, name: `${lesson.name} (${formatAmPm(lesson.startH, lesson.startM)})`, time: target };
+                    }
+                }
+            }
+            for (let i = 1; i <= 7; i++) {
+                const nextDay = (currentDay + i) % 7;
+                if (schedule[nextDay] && schedule[nextDay].length > 0) {
+                    const lesson = schedule[nextDay][0];
+                    const target = new Date(now); target.setDate(target.getDate() + i);
+                    target.setHours(lesson.startH, lesson.startM, 0, 0);
+                    return { inProgress: false, name: `${lesson.name} (${i===1?"Tomorrow":dayNames[nextDay]} ${formatAmPm(lesson.startH, lesson.startM)})`, time: target };
+                }
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', dateOptions);
+            document.getElementById('clock-display').innerText = now.toTimeString().split(' ')[0];
+
+            const lesson = getNextLessonStatus(now);
+            const nameElement = document.getElementById('next-lesson-name');
+            const countdownElement = document.getElementById('lesson-countdown');
+
+            if (lesson.inProgress) {
+                nameElement.innerText = "Current Class: " + lesson.name;
+                countdownElement.innerText = "IN PROGRESS";
+                countdownElement.style.color = "#28a745";
+            } else {
+                nameElement.innerText = "Next Lesson: " + lesson.name;
+                countdownElement.style.color = "#d32f2f";
+                const diffMs = lesson.time - now;
+                const h = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diffMs / 1000 / 60) % 60);
+                const s = Math.floor((diffMs / 1000) % 60);
+                countdownElement.innerText = `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+            }
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

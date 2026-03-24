@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Invigilation - BYKNMC</title>
+    <style>
+        :root {
+            --text-color: #333;
+            --accent-color: #0056b3;
+            --success-color: #28a745;
+            --danger-color: #d9534f;
+            --school-color: #8b0000; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            overflow: hidden; 
+            padding: 2vh; 
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4b65a; 
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 2vh 4vw;
+            border-radius: 16px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+        }
+        
+        .school-title {
+            color: var(--school-color);
+            margin-top: 3vh; 
+            margin-bottom: 1vh;
+            border-bottom: 3px solid var(--school-color);
+            padding-bottom: 1vh;
+        }
+        .school-title h1 {
+            margin: 0;
+            font-size: 4vh; 
+        }
+
+        .header-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+            margin: auto;
+            width: 50%;
+            min-width: 400px;
+        }
+        
+        input[type="text"], input[type="number"] {
+            padding: 1.5vh;
+            font-size: 2.2vh;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #display-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            flex-grow: 1;
+        }
+
+        .exam-title {
+            font-size: 5vh;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+        }
+        .date-display {
+            font-size: 2.2vh;
+            color: #666;
+        }
+        
+        /* Font size reduced to 8.5vh */
+        .clock-display {
+            font-size: 8.5vh; 
+            font-family: monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 0;
+            color: #111;
+            line-height: 1;
+        }
+
+        .exam-times {
+            display: flex;
+            justify-content: center;
+            gap: 3vw;
+        }
+        .time-box {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1.2vh 3vw;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            min-width: 12vw;
+        }
+        .time-label {
+            font-size: 1.8vh;
+            color: #666;
+            font-weight: bold;
+        }
+        .time-value {
+            font-size: 4vh;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: monospace;
+        }
+
+        .timer-container {
+            background: rgba(238, 242, 245, 0.9);
+            padding: 1.5vh;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            margin-bottom: 1vh;
+        }
+        
+        /* Font size increased to 12vh */
+        .timer-display {
+            font-size: 12vh; 
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent-color);
+            line-height: 1;
+            margin: 0.5vh 0;
+        }
+        
+        .timer-display.danger {
+            color: var(--danger-color);
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 2vw;
+            margin-top: 1vh;
+        }
+        button {
+            padding: 1.5vh 3vw;
+            font-size: 2vh;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+
+        #start-btn {
+            background-color: var(--success-color);
+        }
+        #start-btn:hover { background-color: #218838; }
+
+        button.stop-btn { background-color: var(--danger-color); }
+        button.stop-btn:hover { background-color: #c9302c; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="school-title">
+        <h1>Buddhist Yip Kei Nam Memorial College</h1>
+    </div>
+
+    <div id="setup-section" class="header-inputs">
+        <h3 style="margin: 0; font-size: 3vh; color: #555;">Exam Setup</h3>
+        <input type="text" id="subject-input" placeholder="Enter Subject (e.g. English Paper 1)">
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="duration-hours" placeholder="Hours" min="0" style="width: 50%;">
+            <input type="number" id="duration-minutes" placeholder="Minutes" min="0" max="59" style="width: 50%;">
+        </div>
+        <button onclick="startDashboard()" style="background-color: var(--accent-color);">Create Display Board</button>
+    </div>
+
+    <div id="display-section" class="hidden">
+        <div>
+            <div class="exam-title" id="subject-display">Subject Name</div>
+            <div class="date-display" id="date-display">Date</div>
+        </div>
+        
+        <div class="timer-container">
+            <div style="font-size: 2vh; color: #555;">Time Remaining</div>
+            <div class="timer-display" id="timer-display">00:00:00</div>
+            <div class="controls">
+                <button onclick="startExamTimer()" id="start-btn">▶ Start Exam Timer</button>
+                <button class="stop-btn" onclick="resetExam()">✖ Reset / Exit</button>
+            </div>
+        </div>
+        
+        <div class="exam-times">
+            <div class="time-box">
+                <div class="time-label">Start Time</div>
+                <div class="time-value" id="start-time-display">--:--</div>
+            </div>
+            <div class="time-box">
+                <div class="time-label">End Time</div>
+                <div class="time-value" id="end-time-display">--:--</div>
+            </div>
+        </div>
+        
+        <div>
+            <div style="font-size: 2vh; color: #666; margin-bottom: 0.5vh;">Current Time</div>
+            <div class="clock-display" id="clock-display">00:00:00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let countdownInterval;
+    let remainingSeconds = 0;
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    }
+
+    function closeFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', dateOptions);
+        document.getElementById('clock-display').innerText = now.toTimeString().split(' ')[0];
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function startDashboard() {
+        const subject = document.getElementById('subject-input').value || "General Examination";
+        const hours = parseInt(document.getElementById('duration-hours').value) || 0;
+        const minutes = parseInt(document.getElementById('duration-minutes').value) || 0;
+        remainingSeconds = (hours * 3600) + (minutes * 60);
+        
+        if (remainingSeconds <= 0) { 
+            alert("Please enter a valid time duration!"); 
+            return; 
+        }
+
+        openFullscreen();
+        
+        document.getElementById('subject-display').innerText = subject;
+        updateTimerDisplay(); 
+
+        document.getElementById('start-btn').classList.remove('hidden');
+        document.getElementById('setup-section').classList.add('hidden');
+        document.getElementById('display-section').classList.remove('hidden');
+    }
+
+    function updateTimerDisplay() {
+        let hrs = String(Math.floor(remainingSeconds / 3600)).padStart(2, '0');
+        let mins = String(Math.floor((remainingSeconds % 3600) / 60)).padStart(2, '0');
+        let secs = String(remainingSeconds % 60).padStart(2, '0');
+        const display = document.getElementById('timer-display');
+        display.innerText = `${hrs}:${mins}:${secs}`;
+        
+        if (remainingSeconds <= 300 && remainingSeconds > 0) display.classList.add('danger');
+        else display.classList.remove('danger');
+    }
+
+    function startExamTimer() {
+        document.getElementById('start-btn').classList.add('hidden');
+        
+        const now = new Date();
+        document.getElementById('start-time-display').innerText = now.toTimeString().split(' ')[0].substring(0,5);
+        
+        const endDate = new Date(now.getTime() + (remainingSeconds * 1000));
+        document.getElementById('end-time-display').innerText = endDate.toTimeString().split(' ')[0].substring(0,5);
+
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            if (remainingSeconds > 0) { 
+                remainingSeconds--; 
+                updateTimerDisplay(); 
+            } else { 
+                clearInterval(countdownInterval); 
+                const display = document.getElementById('timer-display');
+                display.innerText = "TIME'S UP!"; 
+                display.classList.add('danger');
+            }
+        }, 1000);
+    }
+
+    function resetExam() {
+        closeFullscreen();
+        clearInterval(countdownInterval);
+        document.getElementById('setup-section').classList.remove('hidden');
+        document.getElementById('display-section').classList.add('hidden');
+        document.getElementById('timer-display').classList.remove('danger');
+        document.getElementById('start-time-display').innerText = "--:--";
+        document.getElementById('end-time-display').innerText = "--:--";
+    }
+</script>
+</body>
+</html>
