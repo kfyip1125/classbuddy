@@ -182,18 +182,24 @@
             let messages = [];
 
             try {
-                // Fetch Bible Verse
-                const bibleRes = await fetch('https://labs.bible.org/api/?');
+                // FIXED: Fetch Bible Verse (Added proper parameters)
+                const bibleRes = await fetch('https://labs.bible.org/api/?passage=random&type=json');
                 const bibleData = await bibleRes.json();
                 messages.push(`📖 ${bibleData[0].text} (${bibleData[0].bookname} ${bibleData[0].chapter}:${bibleData[0].verse})`);
 
-                // Fetch Quote
-                const quoteRes = await fetch('https://api.api-ninjas.com/v2/randomquotes');
+                // FIXED: Changed to a free quote API that doesn't require an API Key
+                const quoteRes = await fetch('https://dummyjson.com/quotes/random');
                 const quoteData = await quoteRes.json();
-                messages.push(`🔥 "${quoteData.content}" — ${quoteData.author}`);
+                messages.push(`🔥 "${quoteData.quote}" — ${quoteData.author}`);
 
             } catch (e) {
-                           }
+                // FIXED: Added fallback messages so the marquee never goes blank
+                messages = [
+                    "✨ I can do all things through Christ who strengthens me. (Phil 4:13)",
+                    "🚀 Success is the sum of small efforts, repeated day in and day out.",
+                    "🎯 Focus on your goals! You are capable of great things."
+                ];
+            }
 
             textContainer.innerHTML = messages.map(m => `<span>${m}</span>`).join('');
             
@@ -268,10 +274,11 @@
                 countdownElement.innerText = `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
             }
         }
-        // Update the clock every second
+        
         setInterval(updateTime, 1000);
         updateTime();
-        // ADD THIS LINE: Automatically fetch new online messages every 50 seconds (50000 milliseconds)
+        
+        // Automatically fetch new online messages every 50 seconds 
         setInterval(fetchMessages, 50000);
     </script>
 </body>
