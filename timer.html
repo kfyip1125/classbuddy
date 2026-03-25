@@ -275,9 +275,11 @@
                 countdownElement.innerText = `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
             }
         }
-
+        // Update the clock every second
         setInterval(updateTime, 1000);
         updateTime();
+        // ADD THIS LINE: Automatically fetch new online messages every 50 seconds (50000 milliseconds)
+        setInterval(fetchMessages, 50000);
     </script>
 </body>
 </html>
