@@ -193,14 +193,7 @@
                 messages.push(`🔥 "${quoteData.content}" — ${quoteData.author}`);
 
             } catch (e) {
-                // Fallback messages
-                messages = [
-                    "✨ I can do all things through Christ who strengthens me. (Phil 4:13)",
-                    "🚀 Success is the sum of small efforts, repeated day in and day out.",
-                    "📖 Trust in the LORD with all your heart. (Proverbs 3:5)",
-                    "🎯 Focus on your goals! You are capable of great things."
-                ];
-            }
+                           }
 
             textContainer.innerHTML = messages.map(m => `<span>${m}</span>`).join('');
             
