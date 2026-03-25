@@ -183,12 +183,12 @@
 
             try {
                 // Fetch Bible Verse
-                const bibleRes = await fetch('https://labs.bible.org/api/?passage=random&type=json');
+                const bibleRes = await fetch('https://labs.bible.org/api/?');
                 const bibleData = await bibleRes.json();
                 messages.push(`📖 ${bibleData[0].text} (${bibleData[0].bookname} ${bibleData[0].chapter}:${bibleData[0].verse})`);
 
                 // Fetch Quote
-                const quoteRes = await fetch('https://api.quotable.io/random?tags=motivational');
+                const quoteRes = await fetch('https://api.api-ninjas.com/v2/randomquotes');
                 const quoteData = await quoteRes.json();
                 messages.push(`🔥 "${quoteData.content}" — ${quoteData.author}`);
 
